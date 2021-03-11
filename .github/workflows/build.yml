@@ -33,29 +33,19 @@ jobs:
         run: |
           arduino-cli lib install ESP32Servo
           arduino-cli lib install AceButton
-          
+
       - name: Compile
         run: |
           mkdir build
           echo "Compiling ${{github.repository}}..."
           arduino-cli compile -v -b esp32:esp32:esp32 --build-properties build.partitions=minimal,upload.maximum_size=1966080 --output-dir build YoYoMachines-SpeedDial-ESPNow
 
-      - name: Create spiffs binary
-        run: |
-          /home/runner/.arduino15/packages/esp32/tools/mkspiffs/0.2.3/mkspiffs -c YoYoMachines-SpeedDial-ESPNow/data -b 4096 -p 256 -s 0xB0000 build/spiffs.bin
-
-      - name: Checkout esp_binary_merger
-        uses: actions/checkout@v2
-        with:
-          repository: vtunr/esp32_binary_merger
-          path: esp32_binary_merger
-
       - name: Merge binaries
         run: |
           python esp32_binary_merger/merge_bin_esp.py \
             --output_name app-combined.bin \
-            --bin_path /home/runner/.arduino15/packages/esp32/hardware/esp32/1.0.5/tools/sdk/bin/bootloader_dio_80m.bin build/YoYoMachines-SpeedDial-ESPNow.ino.partitions.bin build/YoYoMachines-SpeedDial-ESPNow.ino.bin build/spiffs.bin \
-            --bin_address 0x1000 0x8000 0x10000 0x150000
+            --bin_path /home/runner/.arduino15/packages/esp32/hardware/esp32/1.0.5/tools/sdk/bin/bootloader_dio_80m.bin build/YoYoMachines-SpeedDial-ESPNow.ino.partitions.bin build/YoYoMachines-SpeedDial-ESPNow.ino.bin \
+            --bin_address 0x1000 0x8000 0x10000
           mv output/app-combined.bin build/app-combined.bin
           mv build/YoYoMachines-SpeedDial-ESPNow.ino.bin build/app.bin
 
