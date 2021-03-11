@@ -40,6 +40,12 @@ jobs:
           echo "Compiling ${{github.repository}}..."
           arduino-cli compile -v -b esp32:esp32:esp32 --build-properties build.partitions=minimal,upload.maximum_size=1966080 --output-dir build YoYoMachines-SpeedDial-ESPNow
 
+      - name: Checkout esp_binary_merger
+        uses: actions/checkout@v2
+        with:
+          repository: vtunr/esp32_binary_merger
+          path: esp32_binary_merger
+
       - name: Merge binaries
         run: |
           python esp32_binary_merger/merge_bin_esp.py \
